@@ -1,0 +1,115 @@
+# Database Schema
+
+```
+┌─────────────────────┐
+│     auth.users      │
+│─────────────────────│
+│ id (UUID PK)        │
+│ email               │
+└──────────┬──────────┘
+           │ 1:1
+           ▼
+┌─────────────────────┐
+│      profiles       │
+│─────────────────────│
+│ id (UUID PK/FK)     │──────────────────────────────────────────────┐
+│ role                │  admin | staff | client                      │
+│ first_name          │                                              │
+│ last_name           │                                              │
+│ email               │                                              │
+│ phone               │                                              │
+│ company             │                                              │
+│ avatar_url          │                                              │
+│ stripe_customer_id  │                                              │
+│ notes               │                                              │
+│ is_active           │                                              │
+└──────────┬──────────┘                                              │
+           │                                                         │
+           │ referenced by                                           │
+           │                                                         │
+     ┌─────┼──────────────────┬──────────────────┐                   │
+     │     │                  │                  │                   │
+     ▼     ▼                  ▼                  ▼                   │
+┌──────────────┐  ┌───────────────┐  ┌───────────────┐              │
+│   bookings   │  │   invoices    │  │   messages    │              │
+│──────────────│  │───────────────│  │───────────────│              │
+│ id           │  │ id            │  │ id            │              │
+│ client_id  ──┤  │ invoice_number│  │ sender_id   ─►profiles      │
+│ booked_by  ──┤  │ client_id   ─►│  │ client_id   ─►profiles      │
+│ start_time   │  │ created_by  ─►│  │ booking_id  ─►bookings      │
+│ end_time     │  │ status        │  │ parent_id   ─►messages       │
+│ status       │  │ due_date      │  │ body          │              │
+│ total_amount │  │ subtotal      │  │ is_internal   │              │
+│ notes        │  │ tax_rate      │  └───────────────┘              │
+│ client_notes │  │ tax_amount    │                                  │
+└──────┬───────┘  │ total         │  ┌───────────────┐              │
+       │          │ stripe_inv_id │  │     files     │              │
+       │          │ notes         │  │───────────────│              │
+       │          │ internal_notes│  │ id            │              │
+       │          └───────┬───────┘  │ uploaded_by ─►profiles       │
+       │                  │          │ booking_id  ─►bookings       │
+       │                  │          │ client_id   ─►profiles       │
+       │          ┌───────▼───────┐  │ file_name     │              │
+       │          │invoice_line_  │  │ file_path     │              │
+       │          │    items      │  │ file_size     │              │
+       │          │───────────────│  │ file_type     │              │
+       │          │ id            │  │ label         │              │
+       │          │ invoice_id  ─►│  │ notes         │              │
+       │          │ booking_id  ─►│  └───────────────┘              │
+       │          │ description   │                                  │
+       │          │ quantity      │  ┌───────────────┐              │
+       │          │ unit_price    │  │   payments    │              │
+       │          │ amount        │  │───────────────│              │
+       │          └───────────────┘  │ id            │              │
+       │                             │ invoice_id  ─►invoices       │
+       │                             │ amount        │              │
+       │                             │ currency      │              │
+       ▼                             │ status        │              │
+┌──────────────────┐                 │ payment_method│              │
+│booking_resources │                 │ stripe_pi_id  │              │
+│──────────────────│                 │ paid_at       │              │
+│ id               │                 └───────────────┘              │
+│ booking_id  ────►bookings                                         │
+│ resource_id ────►resources         ┌───────────────┐              │
+│ time_range       │                 │  engineers    │              │
+│                  │                 │───────────────│              │
+│ ╔══════════════╗ │                 │ id            │              │
+│ ║  EXCLUDE     ║ │                 │ resource_id ─►resources      │
+│ ║  USING GIST  ║ │                 │ user_id     ─►profiles ─────┘
+│ ║  (resource,  ║ │                 │ specialties[] │
+│ ║   time_range)║ │                 │ hourly_rate   │
+│ ╚══════════════╝ │                 └───────────────┘
+└──────────────────┘
+           │                         ┌───────────────┐
+           │                         │studio_features│
+           ▼                         │───────────────│
+┌─────────────────────┐              │ id            │
+│     resources       │              │ studio_id   ─►studios
+│─────────────────────│              │ feature_name  │
+│ id (UUID PK)        │              │ description   │
+│ resource_type       │              └───────────────┘
+│  studio|engineer|   │
+│  equipment          │
+│ name                │
+│ description         │
+│ is_active           │
+│ sort_order          │
+└──┬──────┬───────┬───┘
+   │      │       │
+   │1:1   │1:1    │1:1
+   ▼      ▼       ▼
+┌───────┐┌───────┐┌──────────┐
+│studios││engrs  ││equipment │
+│───────││───────││──────────│
+│ id    ││ id    ││ id       │
+│ res_id││ res_id││ res_id   │
+│ sound-││ user_ ││ category │
+│ proof ││  id   ││ serial_# │
+│ capac ││ specs ││ price    │
+│ rates ││ rate  ││ condition│
+│       ││       ││ default_ │
+│       ││       ││ studio_id│
+└───────┘└───────┘└──────────┘
+```
+
+The key relationship is the **polymorphic resource model** at the bottom — `resources` is the base, with `studios`, `engineers`, and `equipment` as 1:1 detail tables. Conflict detection happens on `booking_resources` via the GIST exclusion constraint, not on bookings directly.
