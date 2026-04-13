@@ -101,7 +101,7 @@ export function PortalDashboard() {
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-lg font-semibold">Upcoming Bookings</h2>
             <Button asChild variant="outline" size="sm">
-              <Link to="/portal/bookings/request">Request Booking</Link>
+              <Link to="/portal/studios">Book a Session</Link>
             </Button>
           </div>
           {bookings.length === 0 ? (

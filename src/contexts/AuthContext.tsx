@@ -40,25 +40,53 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   })
 
   useEffect(() => {
+    let mounted = true
+
+    // Safety timeout — never stay on loading screen forever
+    const timeout = setTimeout(() => {
+      if (mounted) setState(prev => prev.loading ? { ...prev, loading: false } : prev)
+    }, 5000)
+
     supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (!mounted) return
       let profile: Profile | null = null
-      if (session?.user) {
-        profile = await fetchProfile(session.user.id)
+      try {
+        if (session?.user) {
+          profile = await fetchProfile(session.user.id)
+        }
+      } catch {
+        // Profile fetch failed — continue without it
       }
       setState({ user: session?.user ?? null, profile, session, loading: false })
+    }).catch(() => {
+      if (mounted) setState({ user: null, profile: null, session: null, loading: false })
     })
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
+      async (event, session) => {
+        if (!mounted) return
+        // Only refetch profile on meaningful auth events
+        if (event === 'TOKEN_REFRESHED') {
+          setState(prev => ({ ...prev, session }))
+          return
+        }
         let profile: Profile | null = null
-        if (session?.user) {
-          profile = await fetchProfile(session.user.id)
+        try {
+          if (session?.user) {
+            profile = await fetchProfile(session.user.id)
+          }
+        } catch {
+          // Continue without profile
         }
         setState({ user: session?.user ?? null, profile, session, loading: false })
       }
     )
 
-    return () => subscription.unsubscribe()
+    return () => {
+      mounted = false
+      clearTimeout(timeout)
+      subscription.unsubscribe()
+    }
   }, [])
 
   const signUp = async (email: string, password: string, firstName: string, lastName: string) => {

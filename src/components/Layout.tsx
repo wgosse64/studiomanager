@@ -58,28 +58,33 @@ export function InternalLayout() {
           </div>
 
           {user && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                  <Avatar className="h-8 w-8">
-                    <AvatarFallback className="text-xs">{initials}</AvatarFallback>
-                  </Avatar>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <div className="flex items-center gap-2 p-2">
-                  <div className="flex flex-col space-y-1 leading-none">
-                    <p className="font-medium text-sm">{profile?.first_name} {profile?.last_name}</p>
-                    <p className="text-xs text-muted-foreground">{user.email}</p>
+            <div className="flex items-center gap-2">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback className="text-xs">{initials}</AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <div className="flex items-center gap-2 p-2">
+                    <div className="flex flex-col space-y-1 leading-none">
+                      <p className="font-medium text-sm">{profile?.first_name} {profile?.last_name}</p>
+                      <p className="text-xs text-muted-foreground">{user.email}</p>
+                    </div>
                   </div>
-                </div>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <Link to="/settings/team">Settings</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={handleSignOut}>Sign out</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link to="/settings/team">Settings</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleSignOut}>Sign out</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <Button variant="ghost" size="sm" onClick={handleSignOut}>
+                Sign out
+              </Button>
+            </div>
           )}
         </div>
       </header>
@@ -113,6 +118,9 @@ export function PortalLayout() {
             </Link>
             {user && (
               <nav className="hidden md:flex items-center gap-4">
+                <NavLink to="/portal/studios">Studios</NavLink>
+                <NavLink to="/portal/engineers">Engineers</NavLink>
+                <NavLink to="/portal/equipment">Equipment</NavLink>
                 <NavLink to="/portal/bookings">Bookings</NavLink>
                 <NavLink to="/portal/invoices">Invoices</NavLink>
                 <NavLink to="/portal/files">Files</NavLink>
@@ -122,28 +130,33 @@ export function PortalLayout() {
           </div>
 
           {user && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                  <Avatar className="h-8 w-8">
-                    <AvatarFallback className="text-xs">{initials}</AvatarFallback>
-                  </Avatar>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <div className="flex items-center gap-2 p-2">
-                  <div className="flex flex-col space-y-1 leading-none">
-                    <p className="font-medium text-sm">{profile?.first_name} {profile?.last_name}</p>
-                    <p className="text-xs text-muted-foreground">{user.email}</p>
+            <div className="flex items-center gap-2">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback className="text-xs">{initials}</AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <div className="flex items-center gap-2 p-2">
+                    <div className="flex flex-col space-y-1 leading-none">
+                      <p className="font-medium text-sm">{profile?.first_name} {profile?.last_name}</p>
+                      <p className="text-xs text-muted-foreground">{user.email}</p>
+                    </div>
                   </div>
-                </div>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <Link to="/portal/profile">Profile</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={handleSignOut}>Sign out</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link to="/portal/profile">Profile</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleSignOut}>Sign out</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <Button variant="ghost" size="sm" onClick={handleSignOut}>
+                Sign out
+              </Button>
+            </div>
           )}
         </div>
       </header>

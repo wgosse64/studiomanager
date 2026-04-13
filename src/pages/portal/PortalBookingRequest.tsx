@@ -15,11 +15,13 @@ export function PortalBookingRequest() {
   const navigate = useNavigate()
   const [studios, setStudios] = useState<Resource[]>([])
   const [engineers, setEngineers] = useState<Resource[]>([])
+  const [equipment, setEquipment] = useState<Resource[]>([])
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
 
   const [selectedStudio, setSelectedStudio] = useState<string | null>(null)
   const [selectedEngineers, setSelectedEngineers] = useState<string[]>([])
+  const [selectedEquipment, setSelectedEquipment] = useState<string[]>([])
   const [date, setDate] = useState('')
   const [startTime, setStartTime] = useState('10:00')
   const [endTime, setEndTime] = useState('14:00')
@@ -31,12 +33,12 @@ export function PortalBookingRequest() {
         .from('resources')
         .select('*')
         .eq('is_active', true)
-        .in('resource_type', ['studio', 'engineer'])
         .order('sort_order')
 
       const all = data ?? []
       setStudios(all.filter(r => r.resource_type === 'studio'))
       setEngineers(all.filter(r => r.resource_type === 'engineer'))
+      setEquipment(all.filter(r => r.resource_type === 'equipment'))
       setLoading(false)
     }
     load()
@@ -48,9 +50,20 @@ export function PortalBookingRequest() {
     )
   }
 
+  function toggleEquipment(id: string) {
+    setSelectedEquipment(prev =>
+      prev.includes(id) ? prev.filter(e => e !== id) : [...prev, id]
+    )
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!user || !selectedStudio || !date) return
+    const allSelected = [
+      ...(selectedStudio ? [selectedStudio] : []),
+      ...selectedEngineers,
+      ...selectedEquipment,
+    ]
+    if (!user || !date || allSelected.length === 0) return
 
     setSubmitting(true)
 
@@ -76,7 +89,7 @@ export function PortalBookingRequest() {
       return
     }
 
-    const resourceIds = [selectedStudio, ...selectedEngineers]
+    const resourceIds = allSelected
     const timeRange = `[${startISO},${endISO})`
 
     const { error: brError } = await supabase
@@ -109,14 +122,17 @@ export function PortalBookingRequest() {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <Card>
-          <CardHeader><CardTitle className="text-lg">Select Studio</CardTitle></CardHeader>
+          <CardHeader>
+            <CardTitle className="text-lg">Select Studio (optional)</CardTitle>
+            <p className="text-sm text-muted-foreground">Pick a studio, or skip if you only need equipment or an engineer.</p>
+          </CardHeader>
           <CardContent>
             <div className="grid gap-3">
               {studios.map(s => (
                 <button
                   key={s.id}
                   type="button"
-                  onClick={() => setSelectedStudio(s.id)}
+                  onClick={() => setSelectedStudio(selectedStudio === s.id ? null : s.id)}
                   className={`text-left p-3 rounded-lg border transition-colors ${
                     selectedStudio === s.id
                       ? 'border-primary bg-primary/5'
@@ -171,7 +187,7 @@ export function PortalBookingRequest() {
 
         {engineers.length > 0 && (
           <Card>
-            <CardHeader><CardTitle className="text-lg">Engineer Preference (optional)</CardTitle></CardHeader>
+            <CardHeader><CardTitle className="text-lg">Engineer (optional)</CardTitle></CardHeader>
             <CardContent>
               <div className="flex flex-wrap gap-2">
                 {engineers.map(eng => (
@@ -182,6 +198,27 @@ export function PortalBookingRequest() {
                   >
                     <Badge variant={selectedEngineers.includes(eng.id) ? 'default' : 'outline'}>
                       {eng.name}
+                    </Badge>
+                  </button>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {equipment.length > 0 && (
+          <Card>
+            <CardHeader><CardTitle className="text-lg">Equipment (optional)</CardTitle></CardHeader>
+            <CardContent>
+              <div className="flex flex-wrap gap-2">
+                {equipment.map(eq => (
+                  <button
+                    key={eq.id}
+                    type="button"
+                    onClick={() => toggleEquipment(eq.id)}
+                  >
+                    <Badge variant={selectedEquipment.includes(eq.id) ? 'default' : 'outline'}>
+                      {eq.name}
                     </Badge>
                   </button>
                 ))}
@@ -202,7 +239,7 @@ export function PortalBookingRequest() {
           </CardContent>
         </Card>
 
-        <Button type="submit" className="w-full" disabled={submitting || !selectedStudio || !date}>
+        <Button type="submit" className="w-full" disabled={submitting || !date || (!selectedStudio && selectedEngineers.length === 0 && selectedEquipment.length === 0)}>
           {submitting ? 'Submitting...' : 'Submit Booking Request'}
         </Button>
       </form>

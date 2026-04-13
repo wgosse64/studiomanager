@@ -41,7 +41,7 @@ export function PortalBookings() {
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold">My Bookings</h1>
         <Button asChild>
-          <Link to="/portal/bookings/request">Request Booking</Link>
+          <Link to="/portal/studios">Book a Session</Link>
         </Button>
       </div>
 

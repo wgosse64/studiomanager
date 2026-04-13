@@ -2,6 +2,12 @@
 
 Music studio management platform. Internal app for staff/admin + client portal for external clients.
 
+## Git Rules
+
+- Never add `Co-Authored-By` lines to commit messages.
+- Remote uses SSH alias `wgosse64` (not `github.com` directly). Remote URL: `git@wgosse64:wgosse64/studiomanager.git`
+- Default branch: `master`
+
 ## Quick Reference
 
 ```

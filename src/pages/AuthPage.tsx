@@ -1,17 +1,22 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/contexts/AuthContext'
+import { supabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
+type View = 'auth' | 'forgot'
+
 export function AuthPage() {
   const navigate = useNavigate()
   const { signIn, signUp } = useAuth()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [view, setView] = useState<View>('auth')
+  const [resetSent, setResetSent] = useState(false)
 
   const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -27,7 +32,6 @@ export function AuthPage() {
       setError(error.message)
       setLoading(false)
     } else {
-      // Role-based redirect happens in App via the RoleRedirect component
       navigate('/')
     }
   }
@@ -50,6 +54,72 @@ export function AuthPage() {
     } else {
       navigate('/')
     }
+  }
+
+  const handleForgotPassword = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    setLoading(true)
+    setError(null)
+
+    const formData = new FormData(e.currentTarget)
+    const email = formData.get('email') as string
+
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    })
+    if (error) {
+      setError(error.message)
+    } else {
+      setResetSent(true)
+    }
+    setLoading(false)
+  }
+
+  if (view === 'forgot') {
+    return (
+      <div className="flex min-h-screen items-center justify-center px-4">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
+            <CardTitle className="text-2xl">Reset Password</CardTitle>
+            <CardDescription>Enter your email to receive a reset link.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {resetSent ? (
+              <div className="space-y-4 text-center">
+                <p className="text-sm text-muted-foreground">
+                  Check your email for a password reset link.
+                </p>
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => { setView('auth'); setResetSent(false); setError(null) }}
+                >
+                  Back to Sign In
+                </Button>
+              </div>
+            ) : (
+              <form onSubmit={handleForgotPassword} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="reset-email">Email</Label>
+                  <Input id="reset-email" name="email" type="email" required />
+                </div>
+                {error && <p className="text-sm text-destructive">{error}</p>}
+                <Button type="submit" className="w-full" disabled={loading}>
+                  {loading ? 'Sending...' : 'Send Reset Link'}
+                </Button>
+                <button
+                  type="button"
+                  className="w-full text-sm text-muted-foreground hover:text-foreground"
+                  onClick={() => { setView('auth'); setError(null) }}
+                >
+                  Back to Sign In
+                </button>
+              </form>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    )
   }
 
   return (
@@ -80,6 +150,13 @@ export function AuthPage() {
                 <Button type="submit" className="w-full" disabled={loading}>
                   {loading ? 'Signing in...' : 'Sign In'}
                 </Button>
+                <button
+                  type="button"
+                  className="w-full text-sm text-muted-foreground hover:text-foreground"
+                  onClick={() => { setView('forgot'); setError(null) }}
+                >
+                  Forgot your password?
+                </button>
               </form>
             </TabsContent>
 

@@ -6,6 +6,7 @@ import { ProtectedRoute } from '@/components/ProtectedRoute'
 // Public
 import { LandingPage } from '@/pages/LandingPage'
 import { AuthPage } from '@/pages/AuthPage'
+import { ResetPassword } from '@/pages/ResetPassword'
 
 // Internal (staff/admin)
 import { Dashboard } from '@/pages/Dashboard'
@@ -53,6 +54,7 @@ export default function App() {
           <Route element={<PublicLayout />}>
             <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<AuthPage />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
           </Route>
 
           {/* Internal staff/admin routes */}
