@@ -16,6 +16,9 @@ import { BookingsPage } from '@/pages/bookings/BookingsPage'
 import { BookingRequests } from '@/pages/bookings/BookingRequests'
 import { BookingDetail } from '@/pages/bookings/BookingDetail'
 import { NewBooking } from '@/pages/bookings/NewBooking'
+import { NewStudioBooking } from '@/pages/bookings/NewStudioBooking'
+import { NewEngineerBooking } from '@/pages/bookings/NewEngineerBooking'
+import { NewEquipmentBooking } from '@/pages/bookings/NewEquipmentBooking'
 import { ClientsPage } from '@/pages/clients/ClientsPage'
 import { ClientDetail } from '@/pages/clients/ClientDetail'
 import { InviteClient } from '@/pages/clients/InviteClient'
@@ -29,8 +32,13 @@ import { NewInvoice } from '@/pages/invoices/NewInvoice'
 // Client portal
 import { PortalDashboard } from '@/pages/portal/PortalDashboard'
 import { PortalBookings } from '@/pages/portal/PortalBookings'
-import { PortalBookingRequest } from '@/pages/portal/PortalBookingRequest'
 import { PortalBookingDetail } from '@/pages/portal/PortalBookingDetail'
+import { PortalStudios } from '@/pages/portal/PortalStudios'
+import { PortalBookStudio } from '@/pages/portal/PortalBookStudio'
+import { PortalEngineers } from '@/pages/portal/PortalEngineers'
+import { PortalBookEngineer } from '@/pages/portal/PortalBookEngineer'
+import { PortalEquipment } from '@/pages/portal/PortalEquipment'
+import { PortalBookEquipment } from '@/pages/portal/PortalBookEquipment'
 import { PortalInvoices } from '@/pages/portal/PortalInvoices'
 import { PortalInvoiceDetail } from '@/pages/portal/PortalInvoiceDetail'
 import { PortalFiles } from '@/pages/portal/PortalFiles'
@@ -65,6 +73,9 @@ export default function App() {
             <Route path="/bookings" element={<StaffRoute><BookingsPage /></StaffRoute>} />
             <Route path="/bookings/requests" element={<StaffRoute><BookingRequests /></StaffRoute>} />
             <Route path="/bookings/new" element={<StaffRoute><NewBooking /></StaffRoute>} />
+            <Route path="/bookings/new/studio" element={<StaffRoute><NewStudioBooking /></StaffRoute>} />
+            <Route path="/bookings/new/engineer" element={<StaffRoute><NewEngineerBooking /></StaffRoute>} />
+            <Route path="/bookings/new/equipment" element={<StaffRoute><NewEquipmentBooking /></StaffRoute>} />
             <Route path="/bookings/:id" element={<StaffRoute><BookingDetail /></StaffRoute>} />
 
             <Route path="/clients" element={<StaffRoute><ClientsPage /></StaffRoute>} />
@@ -85,8 +96,13 @@ export default function App() {
           {/* Client portal routes */}
           <Route element={<PortalLayout />}>
             <Route path="/portal" element={<ClientRoute><PortalDashboard /></ClientRoute>} />
+            <Route path="/portal/studios" element={<ClientRoute><PortalStudios /></ClientRoute>} />
+            <Route path="/portal/studios/:resourceId/book" element={<ClientRoute><PortalBookStudio /></ClientRoute>} />
+            <Route path="/portal/engineers" element={<ClientRoute><PortalEngineers /></ClientRoute>} />
+            <Route path="/portal/engineers/:resourceId/book" element={<ClientRoute><PortalBookEngineer /></ClientRoute>} />
+            <Route path="/portal/equipment" element={<ClientRoute><PortalEquipment /></ClientRoute>} />
+            <Route path="/portal/equipment/:resourceId/book" element={<ClientRoute><PortalBookEquipment /></ClientRoute>} />
             <Route path="/portal/bookings" element={<ClientRoute><PortalBookings /></ClientRoute>} />
-            <Route path="/portal/bookings/request" element={<ClientRoute><PortalBookingRequest /></ClientRoute>} />
             <Route path="/portal/bookings/:id" element={<ClientRoute><PortalBookingDetail /></ClientRoute>} />
             <Route path="/portal/invoices" element={<ClientRoute><PortalInvoices /></ClientRoute>} />
             <Route path="/portal/invoices/:id" element={<ClientRoute><PortalInvoiceDetail /></ClientRoute>} />
