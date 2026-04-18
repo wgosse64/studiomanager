@@ -13,12 +13,10 @@ export function ResourcesPage() {
 
   useEffect(() => {
     async function load() {
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from('resources')
         .select('*, studios(*), engineers(*), equipment!equipment_resource_id_fkey(*)')
         .order('sort_order')
-      if (error) console.error('Resources fetch error:', error)
-      console.log('Resources data:', data)
       setResources(data ?? [])
       setLoading(false)
     }

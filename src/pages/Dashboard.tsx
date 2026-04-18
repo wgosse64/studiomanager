@@ -29,16 +29,17 @@ export function Dashboard() {
           supabase
             .from('bookings')
             .select('*', { count: 'exact', head: true })
-            .eq('date', today)
-            .in('status', ['confirmed', 'tentative']),
+            .gte('start_time', `${today}T00:00:00`)
+            .lt('start_time', `${today}T23:59:59`)
+            .in('status', ['confirmed', 'requested']),
           supabase
             .from('bookings')
             .select('*', { count: 'exact', head: true })
-            .eq('status', 'pending'),
+            .eq('status', 'requested'),
           supabase
             .from('invoices')
             .select('*', { count: 'exact', head: true })
-            .eq('status', 'unpaid'),
+            .in('status', ['sent', 'overdue']),
           supabase
             .from('profiles')
             .select('*', { count: 'exact', head: true })

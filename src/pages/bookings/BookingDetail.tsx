@@ -90,10 +90,9 @@ export function BookingDetail() {
         .select('invoice:invoices(*)')
         .eq('booking_id', bookingData.id)
         .limit(1)
-        .single()
 
-      if (invoiceData?.invoice) {
-        setInvoice(invoiceData.invoice as unknown as Invoice)
+      if (invoiceData?.[0]?.invoice) {
+        setInvoice(invoiceData[0].invoice as unknown as Invoice)
       }
     }
 

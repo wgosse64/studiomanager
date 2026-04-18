@@ -75,9 +75,6 @@ export function InternalLayout() {
                     </div>
                   </div>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
-                    <Link to="/settings/team">Settings</Link>
-                  </DropdownMenuItem>
                   <DropdownMenuItem onClick={handleSignOut}>Sign out</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>

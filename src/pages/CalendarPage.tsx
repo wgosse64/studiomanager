@@ -82,19 +82,20 @@ export function CalendarPage() {
       setLoading(false)
     }
     load()
-  }, [weekOffset, weekDates])
+  }, [weekOffset, weekDates, reloadTrigger])
 
-  // Real-time subscription
+  // Real-time subscription — use a counter to force reload
+  const [reloadTrigger, setReloadTrigger] = useState(0)
   useEffect(() => {
     const channel = supabase
       .channel('calendar-bookings')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'booking_resources' }, () => {
-        setWeekOffset(w => { void w; return weekOffset }) // trigger reload
+        setReloadTrigger(n => n + 1)
       })
       .subscribe()
 
     return () => { supabase.removeChannel(channel) }
-  }, [weekOffset])
+  }, [])
 
   function getBookingsForCell(studioId: string, date: Date) {
     return bookings.filter(b => {
